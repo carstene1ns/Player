@@ -39,10 +39,12 @@ if(CMAKE_GENERATOR MATCHES "Makefile")
 endif()
 
 # wine checking
-find_program(WINE_EXECUTABLE wine)
-if(EXISTS ${WINE_EXECUTABLE})
-  message(STATUS "wine registry enabled")
-  add_definitions(-DHAVE_WINE=1)
+if(NOT DISABLE_WINE)
+  find_program(WINE_EXECUTABLE wine)
+  if(EXISTS ${WINE_EXECUTABLE})
+    message(STATUS "wine registry enabled")
+    add_definitions(-DHAVE_WINE=1)
+  endif()
 endif()
 
 # shinonome font
@@ -198,33 +200,35 @@ if(DOXYGEN_FOUND)
 endif()
 
 # test
-enable_testing()
+if(NOT DISABLE_TESTS)
+  enable_testing()
 
-set(TEST_GAME_REPOSITORY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/TestGame")
-if(NOT EXISTS ${TEST_GAME_REPOSITORY_PATH})
-  execute_process(COMMAND ${GIT_EXECUTABLE} clone
-    "https://github.com/EasyRPG/TestGame.git"
-    "${TEST_GAME_REPOSITORY_PATH}")
+  set(TEST_GAME_REPOSITORY_PATH "${CMAKE_CURRENT_SOURCE_DIR}/lib/TestGame")
+  if(NOT EXISTS ${TEST_GAME_REPOSITORY_PATH})
+    execute_process(COMMAND ${GIT_EXECUTABLE} clone
+      "https://github.com/EasyRPG/TestGame.git"
+      "${TEST_GAME_REPOSITORY_PATH}")
+  endif()
+  set(TEST_GAME_PATH "${TEST_GAME_REPOSITORY_PATH}/TestGame-2000")
+
+  set(TEST_ENVS "RPG_TEST_GAME_PATH=${TEST_GAME_PATH}")
+  if(EXISTS $ENV{RPG_RTP_PATH})
+    get_filename_component(RPG_RTP_PATH "$ENV{RPG_RTP_PATH}" ABSOLUTE)
+    message(STATUS "using rtp path ${RPG_RTP_PATH}")
+    list(APPEND TEST_ENVS "RPG_RTP_PATH=${RPG_RTP_PATH}")
+  endif()
+
+  file(GLOB TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
+  foreach(i ${TEST_FILES})
+    get_filename_component(name "${i}" NAME_WE)
+    add_executable(test_${name} ${i})
+    target_link_libraries(test_${name} ${EASYRPG_PLAYER_LIBRARIES_ALL})
+    add_dependencies(test_${name} ${PROJECT_NAME}_Static)
+
+    add_test(
+      NAME test_${name} WORKING_DIRECTORY ${TEST_GAME_PATH}
+      COMMAND ${EXECUTABLE_OUTPUT_PATH}/test_${name})
+    set_tests_properties(test_${name}
+      PROPERTIES ENVIRONMENT "${TEST_ENVS}")
+  endforeach()
 endif()
-set(TEST_GAME_PATH "${TEST_GAME_REPOSITORY_PATH}/TestGame-2000")
-
-set(TEST_ENVS "RPG_TEST_GAME_PATH=${TEST_GAME_PATH}")
-if(EXISTS $ENV{RPG_RTP_PATH})
-  get_filename_component(RPG_RTP_PATH "$ENV{RPG_RTP_PATH}" ABSOLUTE)
-  message(STATUS "using rtp path ${RPG_RTP_PATH}")
-  list(APPEND TEST_ENVS "RPG_RTP_PATH=${RPG_RTP_PATH}")
-endif()
-
-file(GLOB TEST_FILES ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.cpp)
-foreach(i ${TEST_FILES})
-  get_filename_component(name "${i}" NAME_WE)
-  add_executable(test_${name} ${i})
-  target_link_libraries(test_${name} ${EASYRPG_PLAYER_LIBRARIES_ALL})
-  add_dependencies(test_${name} ${PROJECT_NAME}_Static)
-
-  add_test(
-    NAME test_${name} WORKING_DIRECTORY ${TEST_GAME_PATH}
-    COMMAND ${EXECUTABLE_OUTPUT_PATH}/test_${name})
-  set_tests_properties(test_${name}
-    PROPERTIES ENVIRONMENT "${TEST_ENVS}")
-endforeach()
