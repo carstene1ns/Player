@@ -109,7 +109,10 @@ endforeach()
 
 # library
 set(EASYRPG_PLAYER_LIBRARIES_ALL
-  ${EASYRPG_PLAYER_LIBRARIES} "${PROJECT_NAME}_Static" liblcf)
+  "${PROJECT_NAME}_Static"
+  liblcf
+  ${EASYRPG_PLAYER_LIBRARIES}
+  ${EASYRPG_TOOLCHAIN_LIBRARIES})
 
 # entry point
 set(MAIN_FILE "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
@@ -142,6 +145,10 @@ if(RUBY_FOUND)
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rtp_table.h"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/rtp_table_bom.h")
 endif()
+
+# add flags specific to a toolchain
+set(CMAKE_CXX_FLAGS "${EASYRPG_TOOLCHAIN_CXX_FLAGS} ${CMAKE_CXX_FLAGS}")
+set(CMAKE_EXE_LINKER_FLAGS "${EASYRPG_TOOLCHAIN_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS}")
 
 # executable
 add_executable(${PROJECT_NAME} MACOSX_BUNDLE ${MAIN_FILE})
