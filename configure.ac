@@ -171,3 +171,39 @@ AC_CONFIG_FILES([Makefile
                  resources/Doxyfile])
 
 AC_OUTPUT
+
+# Print configuration summary
+if test "x$silent" != "xyes"; then
+
+# Helper function
+AC_DEFUN([OPTLIB_STATUS],[
+	AS_IF([test "x$1" = "x1"], [echo "enabled"], [test "x$1" = "x0"], [echo "not found"], [echo "disabled"])
+])
+
+echo
+echo "Configuration Summary"
+echo "====================="
+
+echo
+echo "Optional Features"
+echo "-----------------"
+echo -n "MP3 decoding using libmpg123:       "
+OPTLIB_STATUS($auto_mpg123)
+AS_IF([test "x$auto_mpg123" != "x1"],[
+	echo " => This will fallback to SDL_mixer's MP3 support, which may sometimes"
+	echo "    result in noise or silence."
+])
+echo -n "OGG decoding using libvorbisfile:   "
+OPTLIB_STATUS($auto_oggvorbis)
+echo -n "MIDI decoding using libwildmidi:    "
+OPTLIB_STATUS($auto_wildmidi)
+echo -n "WAV decoding using libsndfile:      "
+OPTLIB_STATUS($auto_sndfile)
+echo -n "Music resampling using libspeexdsp: "
+OPTLIB_STATUS($auto_speexdsp)
+AS_IF([test "x$auto_speexdsp" != "x1"],[
+	echo " => This will disable all pitch changes in Music and Sound effects,"
+	echo "    also "
+])
+
+fi
