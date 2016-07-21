@@ -35,12 +35,14 @@ PKG_CHECK_MODULES([LCF],[liblcf])
 PKG_CHECK_MODULES([PIXMAN],[pixman-1])
 AC_ARG_WITH([freetype], AS_HELP_STRING([--without-freetype], [Disable FreeType font rendering @<:@default=auto@:>@]))
 AS_IF([test "x$with_freetype" != "xno"], [
-	PKG_CHECK_MODULES([FREETYPE],[freetype2],[AC_DEFINE(HAVE_FREETYPE,[1],[Enable FreeType font rendering])],[auto_freetype=0])
+	PKG_CHECK_MODULES([FREETYPE],[freetype2],[AC_DEFINE(HAVE_FREETYPE,[1],[Enable FreeType font rendering]) auto_freetype=1],[auto_freetype=0])
 	AC_ARG_WITH([harfbuzz], AS_HELP_STRING([--without-harfbuzz], [Disable HarfBuzz text shaping @<:@default=auto@:>@]))
 	AS_IF([test "x$with_harfbuzz" != "xno"], [
-		PKG_CHECK_MODULES([HARFBUZZ],[harfbuzz],[AC_DEFINE(HAVE_HARFBUZZ,[1],[Enable HarfBuzz text shaping])],[auto_harfbuzz=0])
+		PKG_CHECK_MODULES([HARFBUZZ],[harfbuzz],[AC_DEFINE(HAVE_HARFBUZZ,[1],[Enable HarfBuzz text shaping]) auto_harfbuzz=1],[auto_harfbuzz=0])
 	])
 ])
+AM_CONDITIONAL([HAVE_FREETYPE],[test "x$auto_freetype" = "x1"])
+AM_CONDITIONAL([HAVE_HARFBUZZ],[test "x$auto_harfbuzz" = "x1"])
 PKG_CHECK_MODULES([SDL],[sdl2],[AC_DEFINE(USE_SDL,[1],[Enable SDL2])],[
 	PKG_CHECK_MODULES([SDL],[sdl],[AC_DEFINE(USE_SDL,[1],[Enable SDL])])
 ])
@@ -52,8 +54,9 @@ PKG_CHECK_MODULES([ZLIB],[zlib])
 AC_ARG_WITH([libmpg123],[AS_HELP_STRING([--without-libmpg123],
 	[Disable improved MP3 support provided by libmpg123. Uses SDL_mixer instead which results in noise or crashes for some MP3s. @<:@default=auto@:>@])])
 AS_IF([test "x$with_libmpg123" != "xno"],[
-	PKG_CHECK_MODULES([MPG123],[libmpg123],[AC_DEFINE(HAVE_MPG123,[1],[Disable improved MP3 support provided by libmpg123])],[auto_mpg123=0])
+	PKG_CHECK_MODULES([MPG123],[libmpg123],[AC_DEFINE(HAVE_MPG123,[1],[Disable improved MP3 support provided by libmpg123]) auto_mpg123=1],[auto_mpg123=0])
 ])
+AM_CONDITIONAL([HAVE_MPG123],[test "x$auto_mpg123" = "x1"])
 # wildmidi has no pkg-config support (yet), this aims to make the same features available
 AC_ARG_VAR([WILDMIDI_CFLAGS], [C compiler flags for WILDMIDI])
 AC_ARG_VAR([WILDMIDI_LIBS], [linker flags for WILDMIDI])
@@ -61,23 +64,27 @@ AC_ARG_WITH([libwildmidi],[AS_HELP_STRING([--with-libwildmidi],
 	[Enable Midi support provided by libwildmidi. @<:@default=no@:>@])])
 AS_IF([test "x$with_libwildmidi" = "xyes"],[
 	AS_IF([test -z "$WILDMIDI_CFLAGS" -a -z "$WILDMIDI_LIBS"],[
-		AC_CHECK_LIB([WildMidi],[WildMidi_Init],[AC_DEFINE(HAVE_WILDMIDI,[1],[Enable Midi support provided by libwildmidi]) WILDMIDI_LIBS=[-lWildMidi]],[auto_wildmidi=0])
+		AC_CHECK_LIB([WildMidi],[WildMidi_Init],[AC_DEFINE(HAVE_WILDMIDI,[1],[Enable Midi support provided by libwildmidi]) WILDMIDI_LIBS=[-lWildMidi] auto_wildmidi=1],[auto_wildmidi=0])
 	],[
 		AC_MSG_CHECKING([for WILDMIDI])
 		AC_MSG_RESULT([assuming yes])
 		AC_DEFINE(HAVE_WILDMIDI,[1],[Enable Midi support provided by libwildmidi])
+		auto_wildmidi=1
 	])
 ])
+AM_CONDITIONAL([HAVE_WILDMIDI],[test "x$auto_wildmidi" = "x1"])
 AC_ARG_WITH([oggvorbis],[AS_HELP_STRING([--without-oggvorbis],
 	[Disable Ogg Vorbis support @<:@default=auto@:>@])])
 AS_IF([test "x$with_oggvorbis" != "xno"],[
-	PKG_CHECK_MODULES([OGGVORBIS],[vorbisfile],[AC_DEFINE(HAVE_OGGVORBIS,[1],[Enable Ogg Vorbis support])],[auto_oggvorbis=0])
+	PKG_CHECK_MODULES([OGGVORBIS],[vorbisfile],[AC_DEFINE(HAVE_OGGVORBIS,[1],[Enable Ogg Vorbis support]) auto_oggvorbis=1],[auto_oggvorbis=0])
 ])
+AM_CONDITIONAL([HAVE_OGGVORBIS],[test "x$auto_oggvorbis" = "x1"])
 AC_ARG_WITH([libsndfile],[AS_HELP_STRING([--without-libsndfile],
 	[Disable improved WAV support provided by libsndfile.  @<:@default=auto@:>@])])
 AS_IF([test "x$with_libsndfile" != "xno"],[
-	PKG_CHECK_MODULES([SNDFILE],[sndfile],[AC_DEFINE(HAVE_LIBSNDFILE,[1],[Disable improved WAV support provided by libsndfile])],[auto_sndfile=0])
+	PKG_CHECK_MODULES([SNDFILE],[sndfile],[AC_DEFINE(HAVE_LIBSNDFILE,[1],[Disable improved WAV support provided by libsndfile]) auto_sndfile=1],[auto_sndfile=0])
 ])
+AM_CONDITIONAL([HAVE_LIBSNDFILE],[test "x$auto_sndfile" = "x1"])
 AC_ARG_WITH([libxmp],[AS_HELP_STRING([--without-libxmp],
 	[Disable tracker module support provided by libxmp. @<:@default=auto@:>@])])
 AS_IF([test "x$with_libxmp" != "xno"],[
@@ -86,8 +93,9 @@ AS_IF([test "x$with_libxmp" != "xno"],[
 AC_ARG_WITH([libspeexdsp],[AS_HELP_STRING([--without-libspeexdsp],
 	[Disable resampling support provided by libspeexdsp. Uses SDL_mixer instead which results in noise. @<:@default=auto@:>@])])
 AS_IF([test "x$with_libspeexdsp" != "xno"],[
-	PKG_CHECK_MODULES([SPEEXDSP],[speexdsp],[AC_DEFINE(HAVE_LIBSPEEXDSP,[1],[Disable resampling support provided by libspeexdsp])],[auto_speexdsp=0])
+	PKG_CHECK_MODULES([SPEEXDSP],[speexdsp],[AC_DEFINE(HAVE_LIBSPEEXDSP,[1],[Disable resampling support provided by libspeexdsp]) auto_speexdsp=1],[auto_speexdsp=0])
 ])
+AM_CONDITIONAL([HAVE_LIBSPEEXDSP],[test "x$auto_speexdsp" = "x1"])
 
 # Checks for header files.
 AC_CHECK_HEADERS([stdint.h stdlib.h string.h unistd.h wchar.h])

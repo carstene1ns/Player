@@ -35,18 +35,6 @@ libeasyrpg_player_la_SOURCES = \
 	src/cache.h \
 	src/color.cpp \
 	src/color.h \
-	src/decoder_libsndfile.cpp \
-	src/decoder_libsndfile.h \
-	src/decoder_oggvorbis.cpp \
-	src/decoder_oggvorbis.h \
-	src/decoder_mpg123.cpp \
-	src/decoder_mpg123.h \
-	src/decoder_fmmidi.cpp \
-	src/decoder_fmmidi.h \
-	src/decoder_wav.cpp \
-	src/decoder_wav.h \
-	src/decoder_wildmidi.cpp \
-	src/decoder_wildmidi.h \
 	src/decoder_xmp.cpp \
 	src/decoder_xmp.h \
 	src/default_graphics.h \
@@ -317,8 +305,30 @@ libeasyrpg_player_la_SOURCES = \
 	src/window_varlist.cpp \
 	src/window_varlist.h
 
+libeasyrpg_player_la_CXXFLAGS = \
+	-I$(srcdir)/src \
+	-std=c++11 \
+	$(LCF_CFLAGS) \
+	$(PIXMAN_CFLAGS) \
+	$(SDL_CFLAGS) \
+	$(SDLMIXER_CFLAGS) \
+	$(PNG_CFLAGS) \
+	$(ZLIB_CFLAGS) \
+	$(XMP_CFLAGS)
+libeasyrpg_player_la_LIBADD = \
+	$(LCF_LIBS) \
+	$(PIXMAN_LIBS) \
+	$(SDL_LIBS) \
+	$(SDLMIXER_LIBS) \
+	$(PNG_LIBS) \
+	$(ZLIB_LIBS) \
+	$(XMP_LIBS)
+
+# optional stuff
 if WANT_FMMIDI
 libeasyrpg_player_la_SOURCES += \
+	src/decoder_fmmidi.cpp \
+	src/decoder_fmmidi.h \
 	src/midiprogram.h \
 	src/midisequencer.cpp \
 	src/midisequencer.h \
@@ -326,39 +336,54 @@ libeasyrpg_player_la_SOURCES += \
 	src/midisynth.h
 endif
 
-libeasyrpg_player_la_CXXFLAGS = \
-	-I$(srcdir)/src \
-	-std=c++11 \
-	$(LCF_CFLAGS) \
-	$(PIXMAN_CFLAGS) \
-	$(FREETYPE_CFLAGS) \
-	$(HARFBUZZ_CFLAGS) \
-	$(SDL_CFLAGS) \
-	$(SDLMIXER_CFLAGS) \
-	$(PNG_CFLAGS) \
-	$(ZLIB_CFLAGS) \
-	$(MPG123_CFLAGS) \
-	$(WILDMIDI_CFLAGS) \
-	$(OGGVORBIS_CFLAGS) \
-	$(SNDFILE_CFLAGS) \
-	$(XMP_CFLAGS) \
-	$(SPEEXDSP_CFLAGS)
-libeasyrpg_player_la_LIBADD = \
-	$(LCF_LIBS) \
-	$(PIXMAN_LIBS) \
-	$(FREETYPE_LIBS) \
-	$(HARFBUZZ_LIBS) \
-	$(SDL_LIBS) \
-	$(SDLMIXER_LIBS) \
-	$(PNG_LIBS) \
-	$(ZLIB_LIBS) \
-	$(MPG123_LIBS) \
-	$(WILDMIDI_LIBS) \
-	$(OGGVORBIS_LIBS) \
-	$(SNDFILE_LIBS) \
-	$(XMP_LIBS) \
-	$(SPEEXDSP_LIBS)
+if HAVE_FREETYPE
+libeasyrpg_player_la_CXXFLAGS += $(FREETYPE_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(FREETYPE_LIBS)
+endif
 
+if HAVE_HARFBUZZ
+libeasyrpg_player_la_CXXFLAGS += $(HARFBUZZ_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(HARFBUZZ_LIBS)
+endif
+
+if HAVE_LIBSNDFILE
+libeasyrpg_player_la_SOURCES += \
+	src/decoder_libsndfile.cpp \
+	src/decoder_libsndfile.h
+libeasyrpg_player_la_CXXFLAGS += $(SNDFILE_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(SNDFILE_LIBS)
+endif
+
+if HAVE_LIBSPEEXDSP
+libeasyrpg_player_la_CXXFLAGS += $(SPEEXDSP_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(SPEEXDSP_LIBS)
+endif
+
+if HAVE_MPG123
+libeasyrpg_player_la_SOURCES += \
+	src/decoder_mpg123.cpp \
+	src/decoder_mpg123.h
+libeasyrpg_player_la_CXXFLAGS += $(MPG123_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(MPG123_LIBS)
+endif
+
+if HAVE_OGGVORBIS
+libeasyrpg_player_la_SOURCES += \
+	src/decoder_oggvorbis.cpp \
+	src/decoder_oggvorbis.h
+libeasyrpg_player_la_CXXFLAGS += $(OGGVORBIS_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(OGGVORBIS_LIBS)
+endif
+
+if HAVE_WILDMIDI
+libeasyrpg_player_la_SOURCES += \
+	src/decoder_wildmidi.cpp \
+	src/decoder_wildmidi.h
+libeasyrpg_player_la_CXXFLAGS += $(WILDMIDI_CFLAGS)
+libeasyrpg_player_la_LIBADD += $(WILDMIDI_LIBS)
+endif
+
+# executable
 easyrpg_player_SOURCES = src/main.cpp
 easyrpg_player_CXXFLAGS = $(libeasyrpg_player_la_CXXFLAGS)
 easyrpg_player_LDADD = libeasyrpg-player.la
