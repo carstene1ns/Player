@@ -11,7 +11,7 @@ AM_MAINTAINER_MODE([enable])
 AM_SILENT_RULES([yes])
 
 AC_CONFIG_MACRO_DIR([builds/autoconf/m4])
-AC_CONFIG_SRCDIR([src/battle_animation.cpp])
+AC_CONFIG_SRCDIR([src/main.cpp])
 AC_CONFIG_HEADERS([config.h])
 
 # Checks for programs.
