@@ -144,8 +144,7 @@ AC_TYPE_UINT8_T
 
 # Checks for library functions.
 AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_CHECK_FUNCS([floor getcwd memset putenv strerror])
+AC_CHECK_FUNCS([malloc floor getcwd memset putenv strerror])
 
 # Manual page.
 AC_CHECK_PROGS([A2X], [a2x a2x.py], [no])
