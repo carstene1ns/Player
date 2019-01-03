@@ -70,6 +70,11 @@ AC_ARG_WITH([libwildmidi],[AS_HELP_STRING([--without-libwildmidi],
 AS_IF([test "x$with_libwildmidi" != "xno"],[
 	PKG_CHECK_MODULES([WILDMIDI],[wildmidi],[AC_DEFINE(HAVE_WILDMIDI,[1],[Enable Midi support provided by libwildmidi])],[auto_wildmidi=0])
 ])
+AC_ARG_WITH([fluidsynth],[AS_HELP_STRING([--with-fluidsynth],
+	[Enable Midi support provided by fluidsynth @<:@default=no@:>@])])
+AS_IF([test "x$with_fluidsynth" = "xyes"],[
+	PKG_CHECK_MODULES([FLUIDSYNTH],[fluidsynth],[AC_DEFINE(HAVE_FLUIDSYNTH,[1],[Enable Midi support provided by fluidsynth])],[auto_fluidsynth=0])
+])
 AC_ARG_WITH([oggvorbis],[AS_HELP_STRING([--without-oggvorbis],
 	[Disable Ogg Vorbis support @<:@default=auto@:>@])])
 AS_IF([test "x$with_oggvorbis" != "xno"],[
