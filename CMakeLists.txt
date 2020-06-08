@@ -690,6 +690,11 @@ if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL.*|libretro)$")
 	endif()
 endif()
 
+if(ANDROID)
+	target_compile_definitions(${PROJECT_NAME} PUBLIC SDL_MAIN_HANDLED=1)
+	target_link_libraries(${PROJECT_NAME} "GLESv1_CM" "log" "atomic")
+endif()
+
 # Executable
 if (${PLAYER_BUILD_EXECUTABLE})
 	add_executable(${PROJECT_NAME}_exe WIN32 "src/main.cpp")

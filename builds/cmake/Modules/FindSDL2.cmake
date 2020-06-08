@@ -125,7 +125,7 @@ if(WIN32 AND SDL2_LIBRARY)
 endif()
 
 
-if(WIN32 OR ANDROID OR IOS OR (APPLE AND NOT _sdl2_framework))
+if(WIN32 OR IOS OR (APPLE AND NOT _sdl2_framework))
 	set(SDL2_EXTRA_REQUIRED SDL2_SDLMAIN_LIBRARY)
 	find_library(SDL2_SDLMAIN_LIBRARY
 		NAMES
@@ -256,6 +256,8 @@ if(SDL2_FOUND)
 					${IOKIT} ${FORCEFEEDBACK} ${CARBON_LIBRARY}
 					${COREAUDIO} ${AUDIOTOOLBOX} ${AUDIOUNIT} ${METAL}
 					${ICONV_LIBRARY})
+		elseif(ANDROID)
+			# nothing to do?!
 		else()
 			# Remove -lSDL2 -lSDL2main from the pkg-config linker line,
 			# to prevent linking against the system library
