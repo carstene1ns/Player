@@ -34,8 +34,8 @@
 #include <cstring>
 #include <stdio.h>
 
-#include "assets.h"
-#include "assets_t3x.h"
+//#include "assets.h"
+//#include "assets_t3x.h"
 
 // 8 MB required for booting and need extra linear memory for the sound
 // effect cache

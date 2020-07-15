@@ -10,7 +10,7 @@ include(PlayerFindPackage)
 # C++14 is required
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_EXTENSIONS ON)
 
 # Source Files
 add_library(${PROJECT_NAME}
@@ -418,7 +418,9 @@ elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "3ds")
 		src/platform/3ds/3ds_clock.h
 		src/platform/3ds/3ds_ui.cpp
 		src/platform/3ds/3ds_ui.h)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC _3DS)
+	set(CMAKE_DL_LIBS "")
+	target_link_libraries(${PROJECT_NAME} -lcitro2d -lcitro3d -lctru)
+	add_custom_target(3dsx ALL DEPENDS ${BINARY_NAME}.3dsx)
 elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "psvita")
 	target_sources(${PROJECT_NAME} PRIVATE
 		src/platform/psvita/psp2_audio.cpp
@@ -436,7 +438,12 @@ elseif(${PLAYER_TARGET_PLATFORM} STREQUAL "switch")
 		src/platform/switch/switch_clock.h
 		src/platform/switch/switch_ui.cpp
 		src/platform/switch/switch_ui.h)
-	target_compile_definitions(${PROJECT_NAME} PUBLIC __SWITCH__)
+	set(CMAKE_DL_LIBS "")
+	set(portlibs "${DEVKITPRO}/portlibs/switch")
+	target_include_directories(${PROJECT_NAME} PUBLIC "${portlibs}/include")
+	target_link_directories(${PROJECT_NAME} PUBLIC "${portlibs}/lib")
+	target_link_libraries(${PROJECT_NAME} -lglad -lEGL -lglapi -ldrm_nouveau -lnx)
+	add_custom_target(nro ALL DEPENDS ${BINARY_NAME}.nro)
 else()
 	message(FATAL_ERROR "Invalid target platform")
 endif()
@@ -563,7 +570,7 @@ else()
 endif()
 
 # Configure Audio backends
-if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL2|libretro)$")
+if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL2|libretro|3ds|switch)$")
 	set(PLAYER_HAS_AUDIO ON)
 	target_compile_definitions(${PROJECT_NAME} PUBLIC SUPPORT_AUDIO=1)
 
@@ -618,7 +625,7 @@ CMAKE_DEPENDENT_OPTION(PLAYER_WITH_OPUS "Play Opus audio with opusfile" ON "PLAY
 CMAKE_DEPENDENT_OPTION(PLAYER_WITH_WILDMIDI "Play MIDI audio with wildmidi" ON "PLAYER_HAS_AUDIO" OFF)
 CMAKE_DEPENDENT_OPTION(PLAYER_WITH_XMP "Play MOD audio with libxmp" ON "PLAYER_HAS_AUDIO" OFF)
 
-if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL.*|libretro)$")
+if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL.*|libretro|3ds|switch)$")
 	set(PLAYER_AUDIO_RESAMPLER "Auto" CACHE STRING "Audio resampler to use. Options: Auto speexdsp samplerate OFF")
 	set_property(CACHE PLAYER_AUDIO_RESAMPLER PROPERTY STRINGS Auto speexdsp samplerate OFF)
 
@@ -716,7 +723,12 @@ if (${PLAYER_BUILD_EXECUTABLE})
 	else()
 		set(EXE_NAME ${PROJECT_NAME}_exe)
 		add_executable(${EXE_NAME} WIN32 "src/main.cpp")
-		set_target_properties(${EXE_NAME} PROPERTIES OUTPUT_NAME "easyrpg-player")
+		if(N3DS OR NSWITCH)
+			set(OUTPUT_NAME "easyrpg-player.elf")
+		else()
+			set(OUTPUT_NAME "easyrpg-player")
+		endif()
+		set_target_properties(${EXE_NAME} PROPERTIES OUTPUT_NAME ${OUTPUT_NAME})
 	endif()
 	
 	if(WIN32)
@@ -863,7 +875,7 @@ if(PLAYER_BUILD_LIBLCF)
 endif()
 
 message(STATUS "Audio backend: ${PLAYER_AUDIO_BACKEND}")
-if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL.*|libretro)$")
+if(${PLAYER_AUDIO_BACKEND} MATCHES "^(SDL.*|libretro|3ds|switch)$")
 	message(STATUS "")
 
 	if(LIBSNDFILE_FOUND)

@@ -36,7 +36,7 @@
 #include <iostream>
 #include <unistd.h>
 
-#include "touch_ui_png.h"
+//#include "touch_ui_png.h"
 
 #ifdef SUPPORT_AUDIO
 #include "switch_audio.h"
@@ -254,7 +254,7 @@ NxUi::NxUi(int width, int height)
 		PF::NoAlpha);
 	Bitmap::SetFormat(Bitmap::ChooseFormat(format));
 	main_surface = Bitmap::Create(width, height, true, 32);
-	touch_ui = Bitmap::Create(touch_ui_png, touch_ui_png_size, false);
+	//touch_ui = Bitmap::Create(touch_ui_png, touch_ui_png_size, false);
 
 	GLint vsh = createAndCompileShader(GL_VERTEX_SHADER, vertexShaderSource);
 	GLint fsh = createAndCompileShader(GL_FRAGMENT_SHADER, fragmentShaderSource);
